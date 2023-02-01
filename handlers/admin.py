@@ -1,0 +1,152 @@
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram import types, Dispatcher
+from aiogram.dispatcher.filters import Text
+from create_bot import bot
+from data_base import sqlite_db
+from keyboards import admin_kb
+
+ID = None
+#
+#
+# class FSMAdmin(StatesGroup):
+#     photo = State()
+#     name = State()
+#     description = State()
+#     link = State()
+#     price = State()
+
+
+# type_of_product = None
+
+
+# Получаем ID текущего модератора
+async def make_changes_command(message: types.Message):
+    global ID
+    ID = message.from_user.id
+    # await bot.send_message(message.from_user.id, 'К работе готов')  # without admin keyboard
+    await bot.send_message(message.from_user.id, 'Модератор готов к работе, выберите кнопку ниже',
+                           reply_markup=admin_kb.button_case_admin_start)
+    await message.delete()
+
+
+async def kind_of_actions(message: types.Message):
+    if message.from_user.id == message.from_user.id:
+        await message.reply('Выберите действие ниже:', reply_markup=admin_kb.button_case_admin_actions)
+#
+#
+# async def add_kind_products(message: types.Message):
+#     if message.from_user.id == ID:
+#         await message.reply('Выберите тип ниже:', reply_markup=admin_kb.button_case_admin_add_product)
+#
+#
+# async def back_to_actions(message: types.Message):
+#     if message.from_user.id == ID:
+#         await message.reply('Выберите действие ниже:', reply_markup=admin_kb.button_case_admin_actions)
+#
+#
+# async def del_kind_products(message: types.Message):
+#     if message.from_user.id == ID:
+#         await message.reply('Выберите тип ниже:', reply_markup=admin_kb.button_case_admin_del_product)
+#
+#
+# # Начало диалога загрузки нового пункта меню / запуск Машины Состояний
+# async def add_knowledge(message: types.Message):
+#     global type_of_product
+#     type_of_product = "not unique"
+#     if message.from_user.id == ID:
+#         await FSMAdmin.photo.set()  # бот переходит в ожидание получения фото
+#         await message.reply('Загрузи фото')
+#
+#
+# async def add_unique_product(message: types.Message):
+#     global type_of_product
+#     type_of_product = "unique"
+#     if message.from_user.id == ID:
+#         await FSMAdmin.photo.set()  # бот переходит в ожидание получения фото
+#         await message.reply('Загрузи фото')
+#
+#
+# # Выход из машины состояния
+# async def cancel_handler(message: types.Message, state: FSMContext):
+#     current_state = await state.get_state()
+#     if current_state is None:
+#         return
+#     await state.finish()
+#     await message.reply('Готово, отменено')
+#
+#
+# # Ловим первый ответ
+# # @dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
+# async def load_photo(message: types.Message, state: FSMContext):
+#     if message.from_user.id == ID:
+#         async with state.proxy() as data:  # в словарь по ключу photo мы записываем картину по ее file id telegram
+#             data['photo'] = message.photo[0].file_id
+#         await FSMAdmin.next()  # через метод next переводим бота в ожидание следующего ответа
+#         await message.reply('Введи название')
+#
+#
+# # Ловим второй ответ
+# # @dp.message_handler(state=FSMAdmin.name)
+# async def load_name(message: types.Message, state: FSMContext):
+#     if message.from_user.id == ID:
+#         async with state.proxy() as data:
+#             data['name'] = message.text
+#         await FSMAdmin.next()
+#         await message.reply('Введи описание')
+#
+#
+# # Ловим третий
+# # @dp.message_handler(state=FSMAdmin.description)
+# async def load_description(message: types.Message, state: FSMContext):
+#     if message.from_user.id == ID:
+#         async with state.proxy() as data:
+#             data['description'] = message.text
+#         await FSMAdmin.next()
+#         await message.reply('Добавь ссылку')
+#
+#
+# # Ловим последний ответ и используем полученные данные
+# # @dp.message_handler(state=FSMAdmin.link)
+# async def load_link(message: types.Message, state: FSMContext):
+#     if type_of_product == "unique":
+#         if message.from_user.id == ID:
+#             async with state.proxy() as data:
+#                 data['link'] = message.text
+#             await FSMAdmin.next()
+#             await message.reply('Добавь цену')
+#     else:
+#         if message.from_user.id == ID:
+#             async with state.proxy() as data:
+#                 data['link'] = message.text
+#             # without Data base
+#             # async with state.proxy() as data:
+#             #     await message.reply(str(data))  # возвращаем заполненный словарь
+#             # with Data Base
+#             await sqlite_db.sql_add_free(state)
+#
+#             await state.finish()
+#             await message.answer('Всё добавлено')
+#
+#
+# # Ловим четвертый
+# # @dp.message_handler(state=FSMAdmin.price)
+# async def load_price(message: types.Message, state: FSMContext):
+#     if message.from_user.id == ID:
+#         async with state.proxy() as data:
+#             data['price'] = float(message.text)
+#
+#         # without Data base
+#         # async with state.proxy() as data:
+#         #     await message.reply(str(data))  # возвращаем заполненный словарь
+#         # with Data Base
+#         await sqlite_db.sql_add_unique(state)
+#         await state.finish()
+#         await message.answer('Всё добавлено')
+
+
+# Регистрация хендлеров
+def register_handlers_admin(dp: Dispatcher):
+    dp.register_message_handler(kind_of_actions, Text(equals='Продукты'))
+    dp.register_message_handler(make_changes_command, commands=['moderator'], is_chat_admin=True)
+

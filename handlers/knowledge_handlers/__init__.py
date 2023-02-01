@@ -1,0 +1,2 @@
+from handlers.knowledge_handlers import admin_knowl
+from handlers.knowledge_handlers import client_knowl
